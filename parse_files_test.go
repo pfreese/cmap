@@ -1,11 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"testing"
-)
-
-// Test for panics based on: https://stackoverflow.com/questions/31595791/how-to-test-panics
+/*
 func TestParseBarcodeFIfile(t *testing.T) {
 	tables := []struct{
 		f string // name of the file
@@ -20,5 +15,13 @@ func TestParseBarcodeFIfile(t *testing.T) {
 			fmt.Println(err)
 		}
 		fmt.Println(res)
+		// 480 entries
+		fmt.Println(len(res))
+		for _, v := range res {
+			// Each has above 60 - 100 measurements
+			fmt.Println(len(v))
+			fmt.Println(v)
+		}
 	}
 }
+*/
