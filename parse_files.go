@@ -7,7 +7,10 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 )
+
+type IDtoFIslice map[int][]int
 
 // seq_name sample_id sample_type organism donor_id sex age_days
 //  brain_hemisphere brain_region brain_subregion facs_date facs_container
@@ -36,11 +39,13 @@ import (
 //	library_prep_set	L8S4_180109_01
 //	library_prep_avg_size_bp	324
 //	seq_tube	SM-GE8ZP R8S4-180117
-func ParseBarcodeGeneMap(file string) error {
+func ParseBarcodeFIfile(file string) (IDtoFIslice, error) {
 	f, err := os.Open(file)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	idToFIslice := make(IDtoFIslice)
 
 	r := csv.NewReader(bufio.NewReader(f))
 	r.Comma = '\t'
@@ -59,10 +64,27 @@ func ParseBarcodeGeneMap(file string) error {
 
 		// The header line
 		if lineNum == 1 {
-			headerLn = record
+			expectedHeader := []string{"barcode_id", "FI"}
+			if !StringSliceEqual(record, expectedHeader) {
+				return nil, fmt.Errorf("Header = %v is not what's expected (=%v)", record, expectedHeader)
+			}
+		} else {
+			if len(record) != 2 {
+				return nil, fmt.Errorf("Split line does not have 2 expected entries: %v", record)
+			}
+			// covert the two entries to ints
+			id, err := strconv.Atoi(record[0])
+			if err != nil {
+				return nil, err
+			}
+			FI, err := strconv.Atoi(record[1])
+			if err != nil {
+				return nil, err
+			}
+			idToFIslice[id] = append(idToFIslice[id], FI)
 		}
 	}
 	fmt.Println(headerLn)
 
-	return nil
+	return idToFIslice, nil
 }
